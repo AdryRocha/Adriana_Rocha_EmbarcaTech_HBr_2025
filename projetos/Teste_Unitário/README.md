@@ -42,34 +42,35 @@ Teste_Unitario/
 
 ├── include/
 
-          └── adc_utils.h          ✅ (declaração da função adc_to_celsius, permitindo que outros arquivos a usem sem 
-                                        conhecer sua implementação.)
+          └── adc_utils.h          (declaração da função adc_to_celsius, permitindo que outros arquivos a usem sem 
+                                    conhecer sua implementação.)
                                  
 ├── src/
 
-          └── adc_utils.c          ✅ (implementação da função - Converte um valor digital (0 a 4095) do ADC para uma tensão entre 0V e 3.3V:
+          └── adc_utils.c          (implementação da função - Converte um valor digital (0 a 4095) do ADC para uma tensão entre 
+                                    0V e 3.3V:
 
-                                       \text{voltage} = \text{adc_val} \times \frac{3.3}{4095}
-                                       Converte a tensão para temperatura usando fórmula fornecida pelo datasheet do RP2040:)
+                                    \text{voltage} = \text{adc_val} \times \frac{3.3}{4095}
+                                    Converte a tensão para temperatura usando fórmula fornecida pelo datasheet do RP2040:)
                                        
-                                       temperatura (°C) = 27 - (V-0.706)/0.001721
+                                    temperatura (°C) = 27 - (V-0.706)/0.001721
                                        
-                                       Isso é baseado no sensor de temperatura interno do RP2040.
+                                    Isso é baseado no sensor de temperatura interno do RP2040.
                                        
 ├── unity/
 
-          ├── unity.c              ✅ (biblioteca Unity)
+          ├── unity.c              (biblioteca Unity)
 
-          ├── unity.h              ✅
+          ├── unity.h              
 
-          └── unity_internals.h    ✅
+          └── unity_internals.h    
 
 ├── test/
 
-          └── test_adc.c           ✅ (arquivo com os testes unitários - Testa a função com um valor de ADC conhecido (876) 
-                                       que representa 0.706V.
+          └── test_adc.c           (arquivo com os testes unitários - Testa a função com um valor de ADC conhecido (876) 
+                                    que representa 0.706V.
 
-                                       Valida se o resultado da conversão é 27 °C, com margem de erro de ±0.1.
+                                   Valida se o resultado da conversão é 27 °C, com margem de erro de ±0.1.
 
                                        UNITY_BEGIN() e UNITY_END() são funções da biblioteca Unity que inicializam e 
                                        finalizam a execução dos testes.)
@@ -87,5 +88,8 @@ ________________________________________________________________________________
 
 - O projeto é uma base prática para desenvolvimento embarcado com boas práticas de testes automáticos.
 
+___________________________________________________________________________________________________________________________
+### Licença
+Este projeto está licenciado sob a MIT License. 
 
 
