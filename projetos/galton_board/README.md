@@ -1,6 +1,6 @@
 # Galton Board Digital
 
-Este projeto implementa uma versão digital de uma Galton Board (ou Plinko), demonstrando como uma série de decisões binárias aleatórias leva a uma **distribuição normal de probabilidades**.
+Este projeto implementa uma simulação da Galton Board (ou Plinko), usando a placa Raspberry Pi Pico W e um display OLED via I2C, demonstrando como uma série de decisões binárias aleatórias leva a uma distribuição normal de probabilidades.
 
 ## Objetivo
 
@@ -8,6 +8,13 @@ Criar uma visualização interativa que simula o comportamento de uma Galton Boa
 
 - Display OLED
 - Botões para incluir desequilíbrios ao modelo
+
+## Estrutura de Arquivos
+
+- `main.c`: Função principal que inicializa o sistema e executa o loop do jogo.
+- `ssd1306.h`: Cabeçalho com definições e protótipos para o display OLED.
+- `ssd1306.c`: Implementação das funções do display.
+- `fonts.h`: Definição da fonte para texto no display.
 
 ##  Lista de materiais: 
 
@@ -35,7 +42,7 @@ Criar uma visualização interativa que simula o comportamento de uma Galton Boa
 
 ##  Arquivos
 
-- `src/main.py`: Código principal do projeto;
+- `src/main.c`: Código principal do projeto;
 - `assets/galton_led.jpg`: Caminhos simulados;
 - `assets/galton_hist.jpg`: Histograma de distribuição.
 
