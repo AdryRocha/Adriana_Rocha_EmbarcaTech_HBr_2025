@@ -1,1 +1,51 @@
+Entendendo o Código
+________________________________________________________________________________________________________________________
+CMakeLists.txt
+Este arquivo configura o processo de build para o projeto Pico.
+Define os padrões C e C++ (C11 e C++17, respectivamente).
+Inclui o Pico SDK e o inicializa.
+Define o executável Seguranca e lista seus arquivos fonte: wifi_conn.c, main.c, mqtt_comm.c.
+Habilita a E/S padrão via USB (pico_enable_stdio_usb(Seguranca 1)).
+Linka as bibliotecas necessárias: pico_stdlib, pico_lwip_mqtt, pico_cyw43_arch_lwip_threadsafe_background, e hardware_rtc. A biblioteca pico_cyw43_arch_lwip_threadsafe_background é crucial, pois executa a pilha de rede LwIP em uma thread separada, permitindo que o loop principal da aplicação permaneça limpo.
+Adiciona o diretório atual e um diretório de teste LwIP específico aos caminhos de inclusão.
+________________________________________________________________________________________________________________________
+lwipopts.h
+Este arquivo contém configurações personalizadas para a pilha LwIP (Lightweight IP) utilizada pelo Pico W.
 
+NO_SYS: Alterado para 0 para LwIP com RTOS (necessário para threadsafe_background).
+MEM_SIZE: Aumentado para (12*1024) bytes para acomodar MQTT e buffers.
+MEMP_NUM_TCP_SEG e PBUF_POOL_SIZE: Configuradas para melhor gerenciamento de segmento TCP e buffer de pacote.
+LWIP_SOCKET: Definido como 0, pois a API LwIP bruta é preferida em vez de sockets para este projeto.
+MQTT_REQ_MAX_IN_FLIGHT: Definido como 5, que define o número máximo de requisições MQTT não reconhecidas que podem ser enviadas simultaneamente.
+MEMP_NUM_SYS_TIMEOUT: Definido como (LWIP_NUM_SYS_TIMEOUT_INTERNAL + 1) para permitir um timeout de sistema extra para a aplicação.
+DEFAULT_THREAD_STACKSIZE e TCPIP_THREAD_STACKSIZE: Configuradas para threads LwIP.
+TCPIP_THREAD_PRIO: Define a prioridade da thread TCP/IP.
+________________________________________________________________________________________________________________________
+main.c
+Esta é a lógica principal da aplicação.
+
+Conexão Wi-Fi: Inicializa o chip Wi-Fi CYW43 e conecta à SSID e senha especificadas usando connect_to_wifi.
+Inicialização MQTT: Chama mqtt_app_init para configurar o cliente MQTT, incluindo o IP do broker, ID do cliente, nome de usuário e senha.
+Inicialização RTC: Inclui uma função opcional init_real_time_clock para potencial sincronização de timestamp, embora neste exemplo não esteja totalmente sincronizada via NTP.
+
+Loop Principal:
+Publica periodicamente mensagens MQTT (a cada 10 segundos).
+Etapa 3 (Publicação Simples): Publica uma mensagem de texto simples "Teste MQTT PicoW - Etapa 3". O tópico de publicação padrão é escola/sala1/temperatura.
+Etapa 4 (Autenticação): Implicitamente tratada pela conexão do cliente MQTT, que inclui nome de usuário e senha. O código prossegue diretamente para a Etapa 5 após uma conexão bem-sucedida.
+Etapa 5 (Criptografia XOR): Utiliza a função xor_encrypt para ofuscar uma mensagem ("OlaMundoSeguro") antes de publicá-la. A função xor_encrypt é definida aqui e declarada extern em mqtt_comm.c.
+Etapa 6 (Proteção Contra Replay): Constrói uma mensagem JSON com um valor (valor simulado) e um ts (timestamp). Tenta usar o RTC para o timestamp, retornando a um simulado se o RTC não estiver funcionando. Este timestamp é então verificado pelo assinante para prevenir ataques de replay.
+________________________________________________________________________________________________________________________
+mqtt_comm.c / mqtt_comm.h
+Estes arquivos lidam com a lógica de comunicação MQTT.
+
+mqtt_app_init: Cria uma nova instância do cliente MQTT, configura as informações de conexão (ID do cliente, usuário, senha, keep-alive) e inicia a conexão com o broker.
+mqtt_connection_cb: Callback chamado quando o status da conexão MQTT muda. Se a conexão for MQTT_CONNECT_ACCEPTED, configura os callbacks para mensagens recebidas (mqtt_incoming_publish_cb, mqtt_incoming_data_cb) e subscreve a um tópico.
+mqtt_incoming_publish_cb: Callback chamado quando uma publicação MQTT é recebida. Prepara o buffer para receber os dados da mensagem.
+mqtt_incoming_data_cb: Callback chamado para receber os dados reais da publicação. Ele concatena os fragmentos de dados e, quando a mensagem está completa, tenta decriptografá-la com XOR (para a Etapa 5) e/ou parsear como JSON para verificar o timestamp (para a Etapa 6). A verificação de replay compara o ts recebido com o last_timestamp_received para aceitar apenas timestamps mais recentes.
+mqtt_app_publish: Publica dados em um tópico MQTT. Verifica se o cliente está conectado antes de tentar publicar.
+get_mqtt_client_instance: Retorna a instância do cliente MQTT.
+________________________________________________________________________________________________________________________
+wifi_conn.c / wifi_conn.h
+Estes arquivos contêm a função para gerenciar a conexão Wi-Fi.
+
+connect_to_wifi(const char *ssid, const char *password): Inicializa o chip CYW43, habilita o modo estação (STA) e tenta conectar à rede Wi-Fi fornecida com um tempo limite. Imprime o status da conexão e o IP atribuído, se bem-sucedido.
