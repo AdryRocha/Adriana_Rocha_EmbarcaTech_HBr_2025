@@ -1,16 +1,17 @@
-#Segurança em IoT com BitDogLab (C/C++)
+## Segurança em IoT com BitDogLab (C/C++)
 
-##Este projeto foca na segurança da comunicação MQTT para dispositivos IoT usando o Raspberry Pi Pico W. Ele demonstra como implementar medidas essenciais de segurança, como autenticação, ofuscação de dados (criptografia leve) e prevenção de ataques de replay. As etapas práticas são projetadas para serem executadas em uma única placa BitDogLab, adaptando-se de um cenário que normalmente envolveria duas placas
+#### Este projeto foca na segurança da comunicação MQTT para dispositivos IoT usando o Raspberry Pi Pico W. Ele demonstra como implementar medidas essenciais de segurança, como autenticação, ofuscação de dados (criptografia leve) e prevenção de ataques de replay. As etapas práticas são projetadas para serem executadas em uma única placa BitDogLab, adaptando-se de um cenário que normalmente envolveria duas placas
 
-##Os principais objetivos incluem:
+_____________________________________________________________________________________________
+#### Os principais objetivos incluem:
 
 - Estabelecer conectividade Wi-Fi usando o Pico W SDK e LwIP.
 - Configurar comunicação MQTT básica para conectar a um broker e publicar dados em tópicos específicos.
 - Implementar autenticação para conexões de cliente MQTT.
 - Aplicar uma cifra XOR simples para criptografia leve para ofuscar o conteúdo da mensagem.
 - Adicionar timestamps às mensagens e validá-las no lado do assinante para prevenir ataques de replay.
-
-##Materiais Necessários
+_____________________________________________________________________________________________
+#### Materiais Necessários
 Para replicar e trabalhar com este projeto, você precisará de:
 
 - Uma placa BitDogLab com Raspberry Pi Pico W.
@@ -20,7 +21,8 @@ Para replicar e trabalhar com este projeto, você precisará de:
 - Mosquitto MQTT broker instalado e configurado no PATH do sistema.
 - Wireshark instalado para análise de tráfego de rede.
 
-##Configuração de Software
+_____________________________________________________________________________________________
+#### Configuração de Software
 
 - Extensões VSCode: Certifique-se de ter as extensões "CMake Tools" e "Pico SDK" instaladas no VSCode. Essas extensões fornecem as funcionalidades necessárias para construir e depurar projetos Pico.
 - Pico SDK: O projeto assume que o Pico SDK está corretamente configurado e acessível. O arquivo CMakeLists.txt inclui uma seção para inicializar o Pico SDK a partir de sua localização de instalação.
@@ -30,7 +32,8 @@ Para replicar e trabalhar com este projeto, você precisará de:
 - Wireshark:
   - Baixe e instale o Wireshark em https://www.wireshark.org/download.html. Esta ferramenta é crucial para observar o tráfego de rede e verificar a criptografia.
 
-#Estrutura do Projeto
+_____________________________________________________________________________________________
+## Estrutura do Projeto
 O projeto consiste em vários arquivos C (.c) e cabeçalho (.h), juntamente com arquivos de configuração CMake:
 
 ├── CMakeLists.txt
@@ -53,15 +56,12 @@ O projeto consiste em vários arquivos C (.c) e cabeçalho (.h), juntamente com 
 - mqtt_comm.c / mqtt_comm.h: Lida com a inicialização do cliente MQTT, conexão, publicação e callbacks de subscrição.
 - wifi_conn.c / wifi_conn.h: Gerencia o estabelecimento da conexão Wi-Fi.
 
-
 _____________________________________________________________________________________________
-
-#Licença
+## Licença
 sob a licença MIT em https://opensource.org/licenses/MIT .
 
 _____________________________________________________________________________________________
-
-#Adriana Rocha
+### Adriana Rocha
 
 
 
