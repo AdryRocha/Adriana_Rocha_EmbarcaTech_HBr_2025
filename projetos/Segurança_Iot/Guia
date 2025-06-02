@@ -1,1 +1,137 @@
+Guia de Configuração e Execução
 
+Para executar este projeto, siga os passos abaixo. Certifique-se de ter todos os materiais e softwares listados no README.md.
+
+Passo 1: Conectando o BitDogLab ao Wi-Fi
+Modifique main.c: Abra o arquivo main.c e atualize as definições WIFI_SSID e WIFI_PASSWORD com as credenciais da sua rede Wi-Fi.
+_______________________________________________________________________________________________________________________
+código
+#define WIFI_SSID "SEU_SSID_AQUI"
+#define WIFI_PASSWORD "SUA_SENHA_AQUI"
+_______________________________________________________________________________________________________________________
+- Compile e faça upload: Compile o projeto usando VSCode e faça o upload para sua placa BitDogLab Pico W.
+- Verifique a saída serial: Abra o monitor serial no VSCode. Você deverá ver mensagens indicando a tentativa de conexão Wi-Fi e, se bem-sucedida, uma mensagem de "Conectado com sucesso ao Wi-Fi!" e o endereço IP atribuído.
+_______________________________________________________________________________________________________________________
+Passo 2: Configuração Básica do MQTT
+- Instale o Mosquitto: Se ainda não o fez, instale o Mosquitto MQTT broker em seu computador.
+- Inicie o Mosquitto: Abra um terminal (Command Prompt no Windows, Terminal no Linux/macOS) e inicie o broker Mosquitto em modo verboso.
+_______________________________________________________________________________________________________________________
+Bash
+mosquitto -v
+_______________________________________________________________________________________________________________________
+Você deverá ver mensagens indicando que o Mosquitto está iniciando e ouvindo na porta 1883.
+
+- Obtenha o IP do seu computador: Você precisará do endereço IP do seu computador (onde o Mosquitto está rodando) para configurar o Pico W. Em sistemas Windows, você pode usar ipconfig no Command Prompt; em Linux/macOS, ifconfig ou ip a.
+- Modifique main.c: Atualize a definição MQTT_BROKER_IP no main.c com o endereço IP do seu computador.
+________________________________________________________________________________________________________________________
+código
+#define MQTT_BROKER_IP "SEU_IP_DO_COMPUTADOR_AQUI"
+________________________________________________________________________________________________________________________
+- Compile e faça upload: Compile o projeto novamente e faça o upload para sua placa BitDogLab Pico W.
+- Verifique a saída serial: No monitor serial, após a conexão Wi-Fi, você deverá ver mensagens indicando a inicialização do cliente MQTT e a tentativa de conexão com o broker.
+________________________________________________________________________________________________________________________
+Passo 3: Publicação MQTT Sem Segurança
+Nesta etapa, o Pico W publicará mensagens de texto simples para um tópico MQTT.
+
+- Configure o Mosquitto: Certifique-se de que o Mosquitto esteja rodando com o comando mosquitto -v.
+- Subscreva ao tópico: Abra outro terminal e subscreva ao tópico que o Pico W irá publicar. O tópico padrão no código é escola/sala1/temperatura.
+________________________________________________________________________________________________________________________
+Bash
+mosquitto_sub -h localhost -t "escola/sala1/temperatura" -v
+________________________________________________________________________________________________________________________
+(Se o Mosquitto estiver em outro IP, substitua localhost pelo IP do seu computador).
+
+- Execute o Pico W: Após fazer o upload do código atualizado, o Pico W começará a publicar mensagens na Etapa 3. Você deverá ver as mensagens "Teste MQTT PicoW - Etapa 3" aparecendo no terminal onde o mosquitto_sub está rodando.
+- Analise com Wireshark:
+  - Inicie o Wireshark e selecione a interface de rede correspondente à sua conexão Wi-Fi.
+  - Comece a capturar.
+  - Filtre por mqtt.
+  - Você verá pacotes "Publish Message" e, ao inspecioná-los, poderá ver o conteúdo da mensagem "Teste MQTT PicoW - Etapa 3" em texto claro. Isso confirma a falta de segurança nesta etapa.
+________________________________________________________________________________________________________________________
+Passo 4: Autenticação Básica no Mosquitto
+Nesta etapa, você adicionará autenticação ao seu broker Mosquitto e configurará o Pico W para usar essas credenciais.
+
+- Crie um arquivo de senha para o Mosquitto:
+  - No terminal, crie um arquivo de senha. Escolha um nome de usuário (ex: aluno) e uma senha (ex: test123). <!-- end list -->
+________________________________________________________________________________________________________________________
+Bash
+# No Linux/macOS:
+sudo mosquitto_passwd -c /etc/mosquitto/passwd aluno
+
+# No Windows (ajuste o caminho se necessário, ex: C:\Program Files\mosquitto\passwd):
+"C:\Program Files\mosquitto\mosquitto_passwd.exe" -c "C:\Program Files\mosquitto\passwd" aluno
+
+Será solicitado que você digite e confirme a senha (por exemplo, test123).
+________________________________________________________________________________________________________________________
+- Configure o mosquitto.conf:
+  - Abra o arquivo de configuração do Mosquitto. No Windows, ele geralmente está em C:\Program Files\mosquitto\mosquitto.conf. No Linux, em /etc/mosquitto/mosquitto.conf.
+  - Adicione ou descomente as seguintes linhas:
+________________________________________________________________________________________________________________________
+Snippet de código
+allow_anonymous false
+password_file /etc/mosquitto/passwd  # Ou o caminho completo para o seu arquivo de senha
+listener 1883
+________________________________________________________________________________________________________________________
+Certifique-se de que o password_file aponta para o arquivo que você acabou de criar.
+________________________________________________________________________________________________________________________
+- Reinicie o Mosquitto com o novo config:
+  - Pare o Mosquitto se ele estiver rodando (Ctrl+C no terminal).
+  - Inicie-o novamente, especificando o arquivo de configuração: <!-- end list -->
+________________________________________________________________________________________________________________________
+Bash
+# No Linux/macOS:
+sudo mosquitto -c /etc/mosquitto/mosquitto.conf -v
+
+# No Windows:
+"C:\Program Files\mosquitto\mosquitto.exe" -c "C:\Program Files\mosquitto\mosquitto.conf" -v
+________________________________________________________________________________________________________________________
+Você pode receber um aviso do firewall do Windows para liberar a porta 1883. Permita o acesso.
+________________________________________________________________________________________________________________________
+Modifique main.c: No arquivo main.c, certifique-se de que as definições MQTT_USER e MQTT_PASSWORD correspondem às credenciais que você definiu no Mosquitto.
+________________________________________________________________________________________________________________________
+código
+#define MQTT_USER "aluno"
+#define MQTT_PASSWORD "test123"
+________________________________________________________________________________________________________________________
+- Compile e faça upload: Compile o projeto e faça o upload para sua placa.
+- Teste a autenticação:
+  - No terminal do mosquitto_sub, adicione o usuário e a senha:
+________________________________________________________________________________________________________________________
+Bash
+mosquitto_sub -h localhost -t "escola/sala1/temperatura" -u aluno -P test123 -v
+________________________________________________________________________________________________________________________
+  - O Pico W tentará se conectar. Se as credenciais estiverem corretas, o Mosquitto registrará uma conexão bem-sucedida. Se as credenciais estiverem erradas, a conexão será rejeitada.
+  - A partir desta etapa, apenas clientes com as credenciais corretas conseguirão se conectar e publicar/subscrever.
+________________________________________________________________________________________________________________________
+Passo 5: Simulando Criptografia Leve (XOR)
+Nesta etapa, o Pico W começará a ofuscar o conteúdo da mensagem usando uma cifra XOR antes de publicar. O assinante precisará decriptografar a mensagem.
+
+- Configuração no Pico W: O código main.c já inclui a função xor_encrypt e a lógica para utilizá-la na Etapa 5. A chave XOR (XOR_KEY) está definida em main.c.
+- Execute o Pico W: Compile e faça o upload do código novamente. O Pico W passará para a Etapa 5 após algumas publicações da Etapa 3.
+- Observe a saída serial: O Pico W imprimirá a mensagem original, a chave XOR e a versão criptografada em hexadecimal antes de publicar.
+- Analise com Wireshark:
+  - Inicie uma nova captura no Wireshark (ou continue a anterior).
+  - Filtre por mqtt.
+  - Observe os pacotes "Publish Message" para o tópico escola/sala1/temperatura.
+  - Você notará que o "Message" (payload) agora exibe bytes ofuscados (hexadecimais ou caracteres ilegíveis), não o texto original "OlaMundoSeguro".
+________________________________________________________________________________________________________________________
+- Verifique no Subscriber: O mqtt_comm.c no Pico W já possui a lógica no callback mqtt_incoming_data_cb para tentar decriptografar mensagens usando a chave XOR. No seu terminal do mosquitto_sub, você receberá o payload ofuscado. Para ver a mensagem decriptografada, você precisaria ter um segundo Pico W ou um cliente MQTT programático que implemente a decriptografia XOR. Como o projeto foi feito com uma placa, o Pico W atuará como publicador e assinante ao mesmo tempo, recebendo suas próprias mensagens (o que é útil para demonstração e depuração da lógica de recebimento e decriptografia). A saída serial do Pico W mostrará: 
+  - A mensagem "Raw" recebida (ofuscada).
+  - A "Tentativa de Decriptografia (XOR com 0xXX)" mostrando a mensagem decriptografada. Se for "OlaMundoSeguro", a decriptografia foi bem-sucedida.
+________________________________________________________________________________________________________________________
+Passo 6: Proteção Contra Replay
+Nesta etapa, as mensagens MQTT incluirão um timestamp, e o assinante verificará se o timestamp é mais recente do que o último recebido, descartando mensagens antigas ou repetidas.
+
+- Configuração no Pico W: O código main.c já inclui a lógica para construir uma mensagem JSON com um valor simulado e um ts (timestamp) na Etapa 6. Ele tenta usar o RTC, mas se não estiver configurado ou sincronizado, usará um timestamp simulado.
+- Execute o Pico W: Compile e faça o upload do código. O Pico W passará para a Etapa 6 após as publicações da Etapa 5.
+- Observe a saída serial: O Pico W imprimirá o JSON que está enviando, contendo o valor e o ts.
+- Verifique no Subscriber (Pico W): No mqtt_comm.c, a função mqtt_incoming_data_cb tenta parsear as mensagens como JSON. Se o parse for bem-sucedido e o ts da mensagem for maior que last_timestamp_received, a mensagem é aceita e last_timestamp_received é atualizado. Caso contrário, uma mensagem "Replay detectado ou timestamp antigo!" será exibida.
+- Teste de Replay:
+  - Deixe o Pico W rodando e publicando mensagens da Etapa 6.
+  - Em um terminal, publique manualmente uma mensagem com um timestamp antigo (menor que o último que você viu o Pico W aceitar):
+________________________________________________________________________________________________________________________
+Bash
+mosquitto_pub -h localhost -t "escola/sala1/temperatura" -u aluno -P test123 -m "{\"valor\":25.0,\"ts\":1678886400}"
+
+(Substitua 1678886400 por um timestamp no passado).
+  - No monitor serial do Pico W, você deverá ver a mensagem "Replay detectado (ts: [timestamp_antigo] &lt;= [ultimo_ts_aceito])". Isso demonstra a proteção contra replay.
