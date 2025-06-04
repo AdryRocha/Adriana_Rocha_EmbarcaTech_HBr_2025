@@ -1,8 +1,8 @@
-## Segurança em IoT com BitDogLab (C/C++)
+## Projeto SecurePicoMQTT - Segurança em IoT com BitDogLab (C/C++)
 
-#### Este projeto foca na segurança da comunicação MQTT para dispositivos IoT usando o Raspberry Pi Pico W. Ele demonstra como implementar medidas essenciais de segurança, como autenticação, ofuscação de dados (criptografia leve) e prevenção de ataques de replay. As etapas práticas são projetadas para serem executadas em uma única placa BitDogLab, adaptando-se de um cenário que normalmente envolveria duas placas
+#### Este projeto foca na segurança da comunicação MQTT para dispositivos IoT, e nesta atividade a placa BitDogLab V6 com Raspberry Pi Pico W. Ele demonstra como implementar medidas essenciais de segurança, como autenticação, ofuscação de dados (criptografia leve) e prevenção de ataques de replay. As etapas práticas são projetadas para serem executadas em uma única placa BitDogLab, adaptando-se de um cenário que normalmente envolveria duas placas
 
-_____________________________________________________________________________________________
+____________________________________________________________________________________
 #### Os principais objetivos incluem:
 
 - Estabelecer conectividade Wi-Fi usando o Pico W SDK e LwIP.
@@ -10,18 +10,32 @@ ________________________________________________________________________________
 - Implementar autenticação para conexões de cliente MQTT.
 - Aplicar uma cifra XOR simples para criptografia leve para ofuscar o conteúdo da mensagem.
 - Adicionar timestamps às mensagens e validá-las no lado do assinante para prevenir ataques de replay.
-_____________________________________________________________________________________________
+- Diagnóstico de Rede: Utilizar Wireshark para monitoramento e análise de tráfego, com solução de problemas de firewall.
+____________________________________________________________________________________
+#### Introdução
+
+MQTT (Message Queuing Telemetry Transport) é um protocolo de comunicação leve e eficiente, projetado para conectar dispositivos em redes com pouca largura de banda, latência alta ou conectividade intermitente — exatamente o tipo de ambiente encontrado em aplicações de Internet das Coisas (IoT). O MQTT segue o modelo publish/subscribe (publicação/assinatura), no qual os dispositivos podem atuar como:
+
+ - Publicadores (publishers): enviam mensagens sobre determinado tópico (ex: "sensor/temperatura").
+ - Subscritores (subscribers): recebem as mensagens dos tópicos que assinaram.
+
+Esse modelo desacopla os emissores e receptores — ou seja, eles não precisam conhecer a existência um do outro, o que facilita muito a escalabilidade e flexibilidade de sistemas IoT com dezenas ou centenas de dispositivos distribuídos.
+
+O broker é o servidor que faz o papel de intermediário: ele recebe mensagens dos publicadores e distribui para todos os subscritores interessados. Ele garante a entrega correta, eficiente e (em níveis mais avançados) confiável das mensagens.
+
+Mosquitto é uma implementação leve e de código aberto de um broker MQTT. Ele é amplamente usado em projetos de IoT por sua facilidade de uso, suporte a autenticação, criptografia e compatibilidade com diversas plataformas, incluindo sistemas embarcados como o Raspberry Pi Pico W.
+____________________________________________________________________________________
 #### Materiais Necessários
 Para replicar e trabalhar com este projeto, você precisará de:
 
 - Uma placa BitDogLab com Raspberry Pi Pico W.
-- Uma rede Wi-Fi protegida (um hotspot de celular pode ser usado).
+- Uma rede Wi-Fi protegida WPA2 - (SSID e senha fornecidos)- (um hotspot de celular pode ser usado).
 - Um computador (Notebook/Desktop) com:
 - VSCode com extensões CMake e Pico SDK instaladas.
 - Mosquitto MQTT broker instalado e configurado no PATH do sistema.
 - Wireshark instalado para análise de tráfego de rede.
 
-_____________________________________________________________________________________________
+____________________________________________________________________________________
 #### Configuração de Software
 
 - Extensões VSCode: Certifique-se de ter as extensões "CMake Tools" e "Pico SDK" instaladas no VSCode. Essas extensões fornecem as funcionalidades necessárias para construir e depurar projetos Pico.
@@ -55,12 +69,17 @@ O projeto consiste em vários arquivos C (.c) e cabeçalho (.h), juntamente com 
 - main.c: A lógica principal da aplicação, coordenando Wi-Fi, comunicação MQTT e implementando recursos de segurança.
 - mqtt_comm.c / mqtt_comm.h: Lida com a inicialização do cliente MQTT, conexão, publicação e callbacks de subscrição.
 - wifi_conn.c / wifi_conn.h: Gerencia o estabelecimento da conexão Wi-Fi.
-
-_____________________________________________________________________________________________
+____________________________________________________________________________________
 ## Licença
 sob a licença MIT em https://opensource.org/licenses/MIT .
-
-_____________________________________________________________________________________________
+_______________________________________________________________________________________________
+## Referências
+- Raspberry Pi Pico SDK Networking
+- Mosquitto Documentation
+- lwIP Documentation
+- BitDogLab GitHub
+- HIVEMQ
+____________________________________________________________________________________
 ### Adriana Rocha
 
 
