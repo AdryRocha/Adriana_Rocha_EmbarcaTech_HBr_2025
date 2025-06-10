@@ -1,6 +1,6 @@
-# Gravador de Áudio com Raspberry Pi Pico
+# Sintetizador de Áudio com Raspberry Pi Pico
 
-Este projeto é um gravador e reprodutor de áudio simples ("Lo-Fi Audio Sampler") implementado em um Raspberry Pi Pico. Ele é capaz de gravar um clipe de áudio de 2 segundos através de um microfone, exibir a forma de onda em um display OLED SSD1306 e reproduzi-la em um buzzer passivo.
+O objetivo do projeto é desenvolver um sintetizador de áudio utilizando a placa BitDogLab. A tarefa consiste em capturar um sinal de áudio analógico pelo microfone, convertê-lo para o formato digital usando o conversor ADC, armazenar temporariamente esses dados na memória RAM e, por fim, reproduzir o som através de um buzzer usando modulação por largura de pulso (PWM). O controle das funções de gravação e reprodução deve ser feito por botões , com feedback visual fornecido por um LED RGB  e a visualização da forma de onda em um display OLED
 
 ## Funcionalidades
 
