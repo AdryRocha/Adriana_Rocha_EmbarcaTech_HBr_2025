@@ -13,8 +13,11 @@ Estrutura de Pastas do Projeto
 
 RTOS_BitDogLab_FreeRTOS/
 │
+
 ├── .gitignore             # Ignora arquivos desnecessários no Git
+
 ├── CMakeLists.txt         # Arquivo de configuração da compilação
+
 ├── FreeRTOSConfig.h       # Arquivo de configuração do FreeRTOS
 ├── LICENSE                # Licença de uso do projeto (MIT)
 ├── README.md              # Documentação principal do projeto
