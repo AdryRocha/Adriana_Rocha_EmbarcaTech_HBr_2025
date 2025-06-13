@@ -23,7 +23,9 @@ RTOS_BitDogLab_FreeRTOS/
 ├── LICENSE                # Licença de uso do projeto (MIT)
 
 ├── README.md              # Documentação principal do projeto
+
 │
+
 └── src/                   # Pasta com todo o código-fonte da aplicação
 
     ├── button.c
